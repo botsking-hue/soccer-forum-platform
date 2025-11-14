@@ -1,5 +1,5 @@
 // API Base URL - using relative paths for Netlify
-const API_BASE = '/api';
+const API_BASE = '/.netlify/functions';
 
 // Auth utilities
 class Auth {
@@ -132,11 +132,11 @@ class API {
     // =======================
 
     static async login(credentials) {
-        return this.post('/auth/login', credentials);
+        return this.post('/login', credentials);
     }
 
     static async signup(userData) {
-        return this.post('/auth/signup', userData);
+        return this.post('/signup', userData);
     }
 
     // =======================
@@ -144,15 +144,15 @@ class API {
     // =======================
 
     static async getUsers() {
-        return this.get('/admin/users');
+        return this.get('/users');
     }
 
     static async addModerator(userId) {
-        return this.post('/admin/add-moderator', { user_id: userId });
+        return this.post('/add-moderator', { user_id: userId });
     }
 
     static async awardBadge(userId, tournamentId, badgeName) {
-        return this.post('/admin/award-badge', {
+        return this.post('/award-badge', {
             user_id: userId,
             tournament_id: tournamentId,
             badge_name: badgeName
@@ -164,19 +164,33 @@ class API {
     // =======================
 
     static async getForumThreads(forumSlug) {
-        return this.get(`/forum/${forumSlug}/threads`);
+        // Handle different forum slugs with appropriate function names
+        if (forumSlug === 'fifa14') {
+            return this.get('/fifa14-threads');
+        } else if (forumSlug === 'others') {
+            return this.get('/others-threads');
+        } else {
+            return this.get('/threads');
+        }
     }
 
     static async createThread(threadData) {
-        return this.post('/threads/create', threadData);
+        // Handle different forum types
+        if (threadData.forum_slug === 'others') {
+            return this.post('/others-create-thread', threadData);
+        } else {
+            return this.post('/create-thread', threadData);
+        }
     }
 
     static async getThread(threadId) {
-        return this.get(`/threads/${threadId}`);
+        // Use the sanitized function names
+        return this.get(`/get-thread?threadId=${threadId}`);
     }
 
     static async postReply(replyData) {
-        return this.post('/threads/reply', replyData);
+        // Use the appropriate reply function based on context
+        return this.post('/thread-reply', replyData);
     }
 
     // =======================
@@ -184,19 +198,19 @@ class API {
     // =======================
 
     static async createTournament(tournamentData) {
-        return this.post('/tournament/create', tournamentData);
+        return this.post('/create', tournamentData);
     }
 
     static async joinTournament(tournamentId) {
-        return this.post('/tournament/join', { tournament_id: tournamentId });
+        return this.post('/join', { tournament_id: tournamentId });
     }
 
     static async getFixtures(tournamentId) {
-        return this.get(`/tournament/fixtures?tournament_id=${tournamentId}`);
+        return this.get(`/fixtures?tournament_id=${tournamentId}`);
     }
 
     static async getTournaments() {
-        return this.get('/tournament/list');
+        return this.get('/threads'); // Note: This might need adjustment based on your actual function
     }
 
     // =======================
@@ -204,19 +218,19 @@ class API {
     // =======================
 
     static async followUser(userId) {
-        return this.post('/follow/user', { followUserId: userId });
+        return this.post('/follow', { followUserId: userId });
     }
 
     static async unfollowUser(userId) {
-        return this.post('/follow/unfollow-user', { unfollowUserId: userId });
+        return this.post('/unfollow-user', { unfollowUserId: userId });
     }
 
     static async followForum(forumId) {
-        return this.post('/forums/follow', { forumId });
+        return this.post('/forum', { forumId }); // Note: This might need adjustment
     }
 
     static async unfollowForum(forumId) {
-        return this.post('/forums/unfollow', { forumId });
+        return this.post('/unfollow-forum', { forumId });
     }
 
     // =======================
