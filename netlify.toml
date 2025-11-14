@@ -1,5 +1,5 @@
 [build]
-  command = "rm -rf netlify && mkdir -p netlify/functions && cp -r functions/* netlify/functions/ 2>/dev/null || (echo 'No functions to copy' && mkdir -p netlify/functions) && cp -r shared netlify/functions/ 2>/dev/null || echo 'No shared libs to copy'"
+  command = "chmod +x ./build.sh && ./build.sh"
   publish = "public"
   functions = "netlify/functions"
 
@@ -11,29 +11,13 @@
   port = 8888
   publish = "public"
 
-# API redirects - MUST come before the SPA fallback
+# API redirects
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
 
-# Specific API endpoints for better organization
-[[redirects]]
-  from = "/api/auth/login"
-  to = "/.netlify/functions/auth/login"
-  status = 200
-
-[[redirects]]
-  from = "/api/auth/signup"
-  to = "/.netlify/functions/auth/signup"
-  status = 200
-
-[[redirects]]
-  from = "/api/test"
-  to = "/.netlify/functions/test"
-  status = 200
-
-# SPA fallback for client-side routing - MUST be last
+# SPA fallback
 [[redirects]]
   from = "/*"
   to = "/index.html"
@@ -46,52 +30,15 @@
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
 
-# CORS headers for API functions
+# CORS headers for API
 [[headers]]
   for = "/.netlify/functions/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type, Authorization, X-Requested-With"
-    Access-Control-Max-Age = "86400"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
 
-# Cache optimization
-[[headers]]
-  for = "/css/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/js/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/assets/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/*.html"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-# Environment configurations
 [context.production.environment]
   NODE_ENV = "production"
   SITE_URL = "https://ahagaming.netlify.app"
-
-[context.deploy-preview.environment]
-  NODE_ENV = "preview" 
-  SITE_URL = "https://deploy-preview-*.netlify.app"
-
-[context.branch-deploy.environment]
-  NODE_ENV = "development"
-  SITE_URL = "https://*-*.netlify.app"
-
-# Development context
-[context.dev.environment]
-  NODE_ENV = "development"
-  SITE_URL = "http://localhost:8888"
