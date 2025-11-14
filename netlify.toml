@@ -11,7 +11,94 @@
   port = 8888
   publish = "public"
 
-# API redirects
+# Flat API routes
+[[redirects]]
+  from = "/api/test"
+  to = "/.netlify/functions/test"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth/login"
+  to = "/.netlify/functions/login"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth/signup"
+  to = "/.netlify/functions/signup"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/users"
+  to = "/.netlify/functions/users"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/add-moderator"
+  to = "/.netlify/functions/add-moderator"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/award-badge"
+  to = "/.netlify/functions/award-badge"
+  status = 200
+
+[[redirects]]
+  from = "/api/threads/create"
+  to = "/.netlify/functions/create-thread"
+  status = 200
+
+[[redirects]]
+  from = "/api/threads/reply"
+  to = "/.netlify/functions/reply"
+  status = 200
+
+[[redirects]]
+  from = "/api/tournament/create"
+  to = "/.netlify/functions/create-tournament"
+  status = 200
+
+[[redirects]]
+  from = "/api/tournament/join"
+  to = "/.netlify/functions/join-tournament"
+  status = 200
+
+[[redirects]]
+  from = "/api/tournament/fixtures"
+  to = "/.netlify/functions/fixtures"
+  status = 200
+
+[[redirects]]
+  from = "/api/follow/user"
+  to = "/.netlify/functions/user"
+  status = 200
+
+[[redirects]]
+  from = "/api/follow/unfollow-user"
+  to = "/.netlify/functions/unfollow-user"
+  status = 200
+
+[[redirects]]
+  from = "/api/forums/follow"
+  to = "/.netlify/functions/follow"
+  status = 200
+
+[[redirects]]
+  from = "/api/forums/unfollow"
+  to = "/.netlify/functions/unfollow-forum"
+  status = 200
+
+# Forum-specific routes (handle potential duplicates)
+[[redirects]]
+  from = "/api/forum/fifa14/threads"
+  to = "/.netlify/functions/threads"
+  status = 200
+
+[[redirects]]
+  from = "/api/forum/others/threads"
+  to = "/.netlify/functions/threads-others"
+  status = 200
+
+# Catch-all for any unmapped routes
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
@@ -31,7 +118,7 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
 
-# CORS headers for API
+# CORS headers
 [[headers]]
   for = "/.netlify/functions/*"
   [headers.values]
