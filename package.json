@@ -5,14 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "python3 -m http.server 8000 -d public",
-    "build": "echo 'No build process needed for static site'",
+    "build": "npm run setup-functions",
     "start": "python3 -m http.server 8000 -d public",
     "netlify-dev": "netlify dev",
-    "setup-functions": "npm run copy-shared-libs && npm run copy-functions",
-    "copy-shared-libs": "mkdir -p netlify/functions/shared && cp -r shared/* netlify/functions/shared/",
-    "copy-functions": "mkdir -p netlify/functions && cp -r functions/* netlify/functions/ 2>/dev/null || echo 'No functions directory found'",
-    "install-deps": "cd netlify/functions && npm install",
+    "setup-functions": "npm run clean && npm run copy-all",
     "clean": "rm -rf netlify/functions",
+    "copy-all": "mkdir -p netlify/functions && cp -r functions/* netlify/functions/ && cp -r shared netlify/functions/",
     "deploy": "npm run setup-functions && netlify deploy --prod",
     "deploy-functions": "npm run setup-functions && netlify deploy --prod --functions",
     "lint": "echo 'No linting configured'",
@@ -21,10 +19,10 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
     "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "@netlify/functions": "^2.4.0"
   },
   "devDependencies": {
-    "@netlify/functions": "^2.4.0",
     "netlify-cli": "^17.0.0"
   },
   "engines": {
