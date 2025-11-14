@@ -7,6 +7,13 @@ echo "📁 Setting up directories..."
 rm -rf netlify
 mkdir -p netlify/functions
 
+# Function to sanitize filenames
+sanitize_filename() {
+    local filename="$1"
+    # Replace square brackets with hyphens and remove other invalid characters
+    echo "$filename" | sed 's/\[/--/g' | sed 's/\]/--/g' | sed 's/[^a-zA-Z0-9._-]/_/g'
+}
+
 # Check if functions directory exists
 if [ -d "functions" ]; then
     echo "✅ Found functions directory"
@@ -17,60 +24,119 @@ if [ -d "functions" ]; then
     # Copy root functions first
     if [ -n "$(find functions -maxdepth 1 -name '*.js' -print -quit)" ]; then
         echo "➡️ Copying root functions..."
-        cp functions/*.js netlify/functions/ 2>/dev/null || echo "No root functions"
+        for file in functions/*.js; do
+            if [ -f "$file" ]; then
+                filename=$(basename "$file")
+                sanitized=$(sanitize_filename "$filename")
+                if [ "$filename" != "$sanitized" ]; then
+                    echo "Renaming $filename to $sanitized"
+                fi
+                cp "$file" "netlify/functions/$sanitized"
+            fi
+        done
     fi
     
     # Copy and flatten auth functions
     if [ -d "functions/auth" ]; then
         echo "➡️ Flattening auth functions..."
-        cp functions/auth/*.js netlify/functions/ 2>/dev/null || echo "No auth functions"
+        for file in functions/auth/*.js; do
+            if [ -f "$file" ]; then
+                filename=$(basename "$file")
+                sanitized=$(sanitize_filename "$filename")
+                if [ "$filename" != "$sanitized" ]; then
+                    echo "Renaming $filename to $sanitized"
+                fi
+                cp "$file" "netlify/functions/$sanitized"
+            fi
+        done
     fi
     
     # Copy and flatten admin functions
     if [ -d "functions/admin" ]; then
         echo "➡️ Flattening admin functions..."
-        cp functions/admin/*.js netlify/functions/ 2>/dev/null || echo "No admin functions"
+        for file in functions/admin/*.js; do
+            if [ -f "$file" ]; then
+                filename=$(basename "$file")
+                sanitized=$(sanitize_filename "$filename")
+                if [ "$filename" != "$sanitized" ]; then
+                    echo "Renaming $filename to $sanitized"
+                fi
+                cp "$file" "netlify/functions/$sanitized"
+            fi
+        done
     fi
     
     # Copy and flatten tournament functions
     if [ -d "functions/tournament" ]; then
         echo "➡️ Flattening tournament functions..."
-        cp functions/tournament/*.js netlify/functions/ 2>/dev/null || echo "No tournament functions"
+        for file in functions/tournament/*.js; do
+            if [ -f "$file" ]; then
+                filename=$(basename "$file")
+                sanitized=$(sanitize_filename "$filename")
+                if [ "$filename" != "$sanitized" ]; then
+                    echo "Renaming $filename to $sanitized"
+                fi
+                cp "$file" "netlify/functions/$sanitized"
+            fi
+        done
     fi
     
     # Copy and flatten threads functions
     if [ -d "functions/threads" ]; then
         echo "➡️ Flattening threads functions..."
-        cp functions/threads/*.js netlify/functions/ 2>/dev/null || echo "No threads functions"
+        for file in functions/threads/*.js; do
+            if [ -f "$file" ]; then
+                filename=$(basename "$file")
+                sanitized=$(sanitize_filename "$filename")
+                if [ "$filename" != "$sanitized" ]; then
+                    echo "Renaming $filename to $sanitized"
+                fi
+                cp "$file" "netlify/functions/$sanitized"
+            fi
+        done
     fi
     
-    # Copy and flatten forum functions
+    # Copy and flatten forum functions - FIXED SECTION
     if [ -d "functions/forum" ]; then
         echo "➡️ Flattening forum functions..."
-        # Handle nested forum structure
         find functions/forum -name "*.js" -type f | while read file; do
             filename=$(basename "$file")
-            # Avoid overwriting files with same name
-            if [ -f "netlify/functions/$filename" ]; then
-                # Add prefix for duplicate names
-                dirname=$(basename $(dirname "$file"))
-                if [ "$dirname" != "forum" ]; then
+            dirname=$(basename $(dirname "$file"))
+            
+            # Sanitize the filename first
+            sanitized=$(sanitize_filename "$filename")
+            
+            # If filename was changed during sanitization, use the sanitized name
+            if [ "$filename" != "$sanitized" ]; then
+                new_name="$sanitized"
+                echo "Sanitized $filename to $new_name"
+            else
+                # Avoid overwriting files with same name by adding prefix
+                if [ -f "netlify/functions/$filename" ] && [ "$dirname" != "forum" ]; then
                     new_name="${dirname}-${filename}"
                     echo "Renaming $file to $new_name (avoid duplicate)"
-                    cp "$file" "netlify/functions/$new_name"
                 else
-                    cp "$file" "netlify/functions/$filename"
+                    new_name="$filename"
                 fi
-            else
-                cp "$file" "netlify/functions/$filename"
             fi
+            
+            cp "$file" "netlify/functions/$new_name"
         done
     fi
     
     # Copy and flatten follow functions
     if [ -d "functions/follow" ]; then
         echo "➡️ Flattening follow functions..."
-        cp functions/follow/*.js netlify/functions/ 2>/dev/null || echo "No follow functions"
+        for file in functions/follow/*.js; do
+            if [ -f "$file" ]; then
+                filename=$(basename "$file")
+                sanitized=$(sanitize_filename "$filename")
+                if [ "$filename" != "$sanitized" ]; then
+                    echo "Renaming $filename to $sanitized"
+                fi
+                cp "$file" "netlify/functions/$sanitized"
+            fi
+        done
     fi
     
     # Ensure CommonJS syntax in all functions
