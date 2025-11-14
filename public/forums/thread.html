@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thread - SoccerForum</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">⚽ SoccerForum</a>
+                <div class="nav-links">
+                    <a href="/forums/fifa14.html" class="nav-link">FIFA 14</a>
+                    <a href="/forums/others.html" class="nav-link">Other FIFA</a>
+                    <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                    <div class="user-menu">
+                        <span class="user-info"></span>
+                        <button onclick="logout()" class="btn btn-outline">Logout</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main style="padding: 2rem 0;">
+        <div class="container">
+            <div style="max-width: 900px; margin: 0 auto;">
+                <div style="margin-bottom: 1.5rem;">
+                    <a href="javascript:history.back()" class="btn btn-outline">← Back to Forum</a>
+                </div>
+
+                <!-- Thread Content -->
+                <div id="threadContainer">
+                    <div class="card">
+                        <div class="alert">Loading thread...</div>
+                    </div>
+                </div>
+
+                <!-- Replies Section -->
+                <div id="repliesContainer" style="margin-top: 2rem;">
+                    <div class="card">
+                        <h3>Replies</h3>
+                        <div id="repliesList" style="margin-top: 1rem;">
+                            <div class="alert">Loading replies...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reply Form -->
+                <div class="card" style="margin-top: 2rem;" id="replyFormContainer">
+                    <h3>Post a Reply</h3>
+                    <form id="replyForm">
+                        <div class="form-group">
+                            <textarea class="form-textarea" name="content" placeholder="Write your reply..." required minlength="1"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">Post Reply</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        let currentThreadId = null;
+
+        // Get thread ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const threadId = urlParams.get('id');
+
+        async function loadThread() {
+            if (!threadId) {
+                document.getElementById('threadContainer').innerHTML = `
+                    <div class="alert alert-error">Thread ID is missing</div>
+                `;
+                return;
+            }
+
+            currentThreadId = threadId;
+
+            try {
+                const data = await ForumManager.loadThread(threadId);
+                
+                // Display thread
+                document.getElementById('threadContainer').innerHTML = `
+                    <div class="card">
+                        <div style="border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1rem;">
+                            <h1 style="margin-bottom: 0.5rem;">${data.thread.title}</h1>
+                            <div style="display: flex; gap: 1rem; color: var(--text-light); font-size: 0.875rem;">
+                                <span>Posted by <strong>${data.thread.creator.username}</strong></span>
+                                <span>•</span>
+                                <span>${new Date(data.thread.created_at).toLocaleString()}</span>
+                                <span>•</span>
+                                <span>${data.stats.total_replies} replies</span>
+                                ${data.thread.tags && data.thread.tags.length > 0 ? `
+                                    <span>•</span>
+                                    <span>${data.thread.tags.map(tag => 
+                                        `<span style="background: var(--primary); color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.75rem;">${tag}</span>`
+                                    ).join(' ')}</span>
+                                ` : ''}
+                            </div>
+                        </div>
+                        
+                        <div style="line-height: 1.6; margin-bottom: 1rem;">
+                            ${data.thread.content}
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                            <button class="btn btn-outline" onclick="likeThread()">👍 Like</button>
+                            <button class="btn btn-outline" onclick="shareThread()">🔗 Share</button>
+                            ${Auth.getUser() && (Auth.getUser().id === data.thread.creator.id || Auth.isAdmin()) ? `
+                                <button class="btn btn-outline" onclick="editThread()">✏️ Edit</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+
+                // Display replies
+                const repliesList = document.getElementById('repliesList');
+                if (data.replies && data.replies.length > 0) {
+                    repliesList.innerHTML = data.replies.map(reply => `
+                        <div style="padding: 1.5rem; border-bottom: 1px solid var(--border);">
+                            <div style="display: flex; justify-content: between; margin-bottom: 0.5rem;">
+                                <div>
+                                    <strong>${reply.user.username}</strong>
+                                    ${reply.user.role !== 'user' ? 
+                                        `<span style="background: var(--success); color: white; padding: 0.1rem 0.5rem; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem;">${reply.user.role}</span>` : 
+                                        ''
+                                    }
+                                </div>
+                                <div style="color: var(--text-light); font-size: 0.875rem;">
+                                    ${new Date(reply.created_at).toLocaleString()}
+                                </div>
+                            </div>
+                            <div style="line-height: 1.6;">
+                                ${reply.content}
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">👍 Like</button>
+                                ${Auth.getUser() && (Auth.getUser().id === reply.user.id || Auth.isAdmin()) ? `
+                                    <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">✏️ Edit</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    repliesList.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: var(--text-light);">
+                            <p>No replies yet. Be the first to reply!</p>
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                document.getElementById('threadContainer').innerHTML = `
+                    <div class="alert alert-error">
+                        Error loading thread: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Handle reply form submission
+        document.getElementById('replyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!Auth.isAuthenticated()) {
+                alert('Please login to post a reply');
+                window.location.href = '/auth/login.html';
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const content = formData.get('content');
+
+            try {
+                await ForumManager.postReply(currentThreadId, content);
+            } catch (error) {
+                alert(`Error posting reply: ${error.message}`);
+            }
+        });
+
+        // Utility functions
+        function likeThread() {
+            alert('Like functionality coming soon!');
+        }
+
+        function shareThread() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Thread link copied to clipboard!');
+            });
+        }
+
+        function editThread() {
+            alert('Edit functionality coming soon!');
+        }
+
+        // Load thread when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            if (Auth.checkAuth()) {
+                loadThread();
+            }
+        });
+    </script>
+</body>
+</html>

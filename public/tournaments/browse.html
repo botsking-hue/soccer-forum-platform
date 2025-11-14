@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournaments - SoccerForum</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">⚽ SoccerForum</a>
+                <div class="nav-links">
+                    <a href="/forums/fifa14.html" class="nav-link">FIFA 14</a>
+                    <a href="/forums/others.html" class="nav-link">Other FIFA</a>
+                    <a href="/tournaments/browse.html" class="nav-link active">Tournaments</a>
+                    <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                    <div class="user-menu">
+                        <span class="user-info"></span>
+                        <a href="/tournaments/create.html" class="btn btn-success">Create Tournament</a>
+                        <button onclick="logout()" class="btn btn-outline">Logout</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main style="padding: 2rem 0;">
+        <div class="container">
+            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 2rem;">
+                <div>
+                    <h1>Tournaments</h1>
+                    <p style="color: var(--text-light);">Compete against other players and win badges</p>
+                </div>
+                <div class="auth-only" style="display: none;">
+                    <a href="/tournaments/create.html" class="btn btn-success">+ Create Tournament</a>
+                </div>
+            </div>
+
+            <!-- Tournament Filters -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <div>
+                        <label class="form-label">Game Version</label>
+                        <select class="form-select" style="width: 200px;" onchange="filterTournaments()">
+                            <option value="all">All Versions</option>
+                            <option value="fifa14">FIFA 14</option>
+                            <option value="fifa15">FIFA 15</option>
+                            <option value="fifa16">FIFA 16</option>
+                            <option value="efootball">eFootball 2025</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Status</label>
+                        <select class="form-select" style="width: 200px;" onchange="filterTournaments()">
+                            <option value="all">All Status</option>
+                            <option value="pending">Upcoming</option>
+                            <option value="active">Active</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;"></div>
+                    <div>
+                        <label class="form-label">Search</label>
+                        <input type="text" class="form-input" style="width: 250px;" placeholder="Search tournaments..." onkeyup="searchTournaments()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tournaments Grid -->
+            <div id="tournamentsContainer">
+                <div class="grid grid-3">
+                    <!-- Tournament cards will be loaded here -->
+                    <div class="card">
+                        <div class="alert">Loading tournaments...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" style="display: none;">
+                <div class="card" style="text-align: center; padding: 3rem;">
+                    <h3>No tournaments found</h3>
+                    <p style="color: var(--text-light); margin-bottom: 2rem;">Be the first to create a tournament!</p>
+                    <a href="/tournaments/create.html" class="btn btn-success">Create Tournament</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        let allTournaments = [];
+
+        async function loadTournaments() {
+            try {
+                // Simulate API call - replace with actual API
+                allTournaments = [
+                    {
+                        id: '1',
+                        name: 'FIFA 14 Champions League',
+                        game_version: 'FIFA 14',
+                        status: 'active',
+                        max_teams: 16,
+                        current_teams: 12,
+                        creator: 'tournament_master',
+                        created_at: '2024-01-15',
+                        description: 'Compete in this exciting FIFA 14 tournament with knockout stages'
+                    },
+                    {
+                        id: '2',
+                        name: 'eFootball 2025 Pro Cup',
+                        game_version: 'eFootball 2025',
+                        status: 'pending',
+                        max_teams: 32,
+                        current_teams: 8,
+                        creator: 'pro_gamer',
+                        created_at: '2024-01-16',
+                        description: 'New eFootball 2025 tournament with amazing prizes'
+                    },
+                    {
+                        id: '3',
+                        name: 'FIFA 16 Legacy Tournament',
+                        game_version: 'FIFA 16',
+                        status: 'completed',
+                        max_teams: 8,
+                        current_teams: 8,
+                        creator: 'fifa_legend',
+                        created_at: '2024-01-10',
+                        description: 'Completed tournament - check out the results!'
+                    }
+                ];
+
+                displayTournaments(allTournaments);
+            } catch (error) {
+                document.getElementById('tournamentsContainer').innerHTML = `
+                    <div class="alert alert-error">
+                        Error loading tournaments: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function displayTournaments(tournaments) {
+            const container = document.getElementById('tournamentsContainer');
+            const emptyState = document.getElementById('emptyState');
+
+            if (tournaments.length === 0) {
+                container.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            container.style.display = 'block';
+            emptyState.style.display = 'none';
+
+            container.innerHTML = `
+                <div class="grid grid-3">
+                    ${tournaments.map(tournament => `
+                        <div class="card tournament-card">
+                            <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 1rem;">
+                                <h3 style="margin: 0; flex: 1;">${tournament.name}</h3>
+                                <span class="tournament-status status-${tournament.status}">
+                                    ${tournament.status}
+                                </span>
+                            </div>
+                            
+                            <div style="color: var(--text-light); margin-bottom: 1rem;">
+                                <strong>Game:</strong> ${tournament.game_version}<br>
+                                <strong>Teams:</strong> ${tournament.current_teams}/${tournament.max_teams}<br>
+                                <strong>Creator:</strong> ${tournament.creator}
+                            </div>
+                            
+                            <p style="margin-bottom: 1.5rem; font-size: 0.9rem;">
+                                ${tournament.description}
+                            </p>
+                            
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <a href="/tournaments/join.html?id=${tournament.id}" class="btn btn-primary" style="flex: 1;">
+                                    ${tournament.status === 'pending' ? 'Join Tournament' : 'View Details'}
+                                </a>
+                                <a href="/tournaments/fixtures.html?id=${tournament.id}" class="btn btn-outline">
+                                    Fixtures
+                                </a>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function filterTournaments() {
+            const gameFilter = document.querySelector('select').value;
+            const statusFilter = document.querySelectorAll('select')[1].value;
+
+            const filtered = allTournaments.filter(tournament => {
+                const gameMatch = gameFilter === 'all' || tournament.game_version.toLowerCase().includes(gameFilter);
+                const statusMatch = statusFilter === 'all' || tournament.status === statusFilter;
+                return gameMatch && statusMatch;
+            });
+
+            displayTournaments(filtered);
+        }
+
+        function searchTournaments() {
+            const searchTerm = document.querySelector('input[type="text"]').value.toLowerCase();
+            
+            if (!searchTerm) {
+                displayTournaments(allTournaments);
+                return;
+            }
+
+            const filtered = allTournaments.filter(tournament => 
+                tournament.name.toLowerCase().includes(searchTerm) ||
+                tournament.description.toLowerCase().includes(searchTerm) ||
+                tournament.creator.toLowerCase().includes(searchTerm)
+            );
+
+            displayTournaments(filtered);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (Auth.checkAuth()) {
+                loadTournaments();
+            }
+        });
+    </script>
+</body>
+</html>

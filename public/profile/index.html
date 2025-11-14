@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - SoccerForum</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">⚽ SoccerForum</a>
+                <div class="nav-links">
+                    <a href="/forums/fifa14.html" class="nav-link">FIFA 14</a>
+                    <a href="/forums/others.html" class="nav-link">Other FIFA</a>
+                    <a href="/tournaments/browse.html" class="nav-link">Tournaments</a>
+                    <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                    <div class="user-menu">
+                        <span class="user-info"></span>
+                        <a href="/profile/settings.html" class="btn btn-outline">Settings</a>
+                        <button onclick="logout()" class="btn btn-outline">Logout</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main style="padding: 2rem 0;">
+        <div class="container">
+            <div style="max-width: 1000px; margin: 0 auto;">
+                <!-- Profile Header -->
+                <div class="card" style="text-align: center; padding: 3rem;">
+                    <div style="width: 100px; height: 100px; background: var(--primary); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white;">
+                        ${Auth.getUser() ? Auth.getUser().username.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <h1 id="profileUsername">Loading...</h1>
+                    <p style="color: var(--text-light);" id="profileRole">Member</p>
+                    <div style="display: flex; gap: 2rem; justify-content: center; margin-top: 2rem;">
+                        <div style="text-align: center;">
+                            <div class="stat-number" id="profileThreads">0</div>
+                            <div>Threads</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div class="stat-number" id="profileReplies">0</div>
+                            <div>Replies</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div class="stat-number" id="profileTournaments">0</div>
+                            <div>Tournaments</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div class="stat-number" id="profileBadges">0</div>
+                            <div>Badges</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-2" style="margin-top: 2rem; gap: 2rem;">
+                    <!-- Recent Activity -->
+                    <div class="card">
+                        <h2>Recent Activity</h2>
+                        <div id="recentActivity" style="margin-top: 1rem;">
+                            <div class="alert">Loading activity...</div>
+                        </div>
+                    </div>
+
+                    <!-- Badges -->
+                    <div class="card">
+                        <h2>Badges & Achievements</h2>
+                        <div id="badgesList" style="margin-top: 1rem;">
+                            <div class="grid grid-2">
+                                <div style="text-align: center; padding: 1rem;">
+                                    <div style="width: 60px; height: 60px; background: gold; border-radius: 50%; margin: 0 auto 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                        🏆
+                                    </div>
+                                    <strong>Tournament Champion</strong>
+                                    <div style="font-size: 0.875rem; color: var(--text-light);">Win a tournament</div>
+                                </div>
+                                <div style="text-align: center; padding: 1rem;">
+                                    <div style="width: 60px; height: 60px; background: silver; border-radius: 50%; margin: 0 auto 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                        💬
+                                    </div>
+                                    <strong>Active Member</strong>
+                                    <div style="font-size: 0.875rem; color: var(--text-light);">Post 50 replies</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Threads -->
+                    <div class="card">
+                        <h2>My Threads</h2>
+                        <div id="myThreads" style="margin-top: 1rem;">
+                            <div class="alert">Loading your threads...</div>
+                        </div>
+                        <div style="text-align: center; margin-top: 1rem;">
+                            <a href="/forums/create-thread.html" class="btn btn-outline">Create New Thread</a>
+                        </div>
+                    </div>
+
+                    <!-- Tournament History -->
+                    <div class="card">
+                        <h2>Tournament History</h2>
+                        <div id="tournamentHistory" style="margin-top: 1rem;">
+                            <div class="alert">Loading tournament history...</div>
+                        </div>
+                        <div style="text-align: center; margin-top: 1rem;">
+                            <a href="/tournaments/browse.html" class="btn btn-outline">Join Tournament</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        function loadProfileData() {
+            const user = Auth.getUser();
+            if (!user) return;
+
+            // Set basic profile info
+            document.getElementById('profileUsername').textContent = user.username;
+            document.getElementById('profileRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            
+            // Set stats (simulated)
+            document.getElementById('profileThreads').textContent = '12';
+            document.getElementById('profileReplies').textContent = '45';
+            document.getElementById('profileTournaments').textContent = '3';
+            document.getElementById('profileBadges').textContent = '2';
+
+            // Load recent activity
+            document.getElementById('recentActivity').innerHTML = `
+                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                    <strong>Posted reply</strong> in "Best FIFA 14 formations"
+                    <div style="color: var(--text-light); font-size: 0.875rem;">2 hours ago</div>
+                </div>
+                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                    <strong>Created thread</strong> "Tournament strategies"
+                    <div style="color: var(--text-light); font-size: 0.875rem;">1 day ago</div>
+                </div>
+                <div style="padding: 1rem;">
+                    <strong>Joined tournament</strong> "FIFA 14 Champions League"
+                    <div style="color: var(--text-light); font-size: 0.875rem;">3 days ago</div>
+                </div>
+            `;
+
+            // Load my threads
+            document.getElementById('myThreads').innerHTML = `
+                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                    <a href="/forums/thread.html?id=1" style="font-weight: 500;">Best FIFA 14 formations in 2024</a>
+                    <div style="color: var(--text-light); font-size: 0.875rem;">15 replies • 2 days ago</div>
+                </div>
+                <div style="padding: 1rem;">
+                    <a href="/forums/thread.html?id=2" style="font-weight: 500;">Tournament strategies that work</a>
+                    <div style="color: var(--text-light); font-size: 0.875rem;">8 replies • 1 week ago</div>
+                </div>
+            `;
+
+            // Load tournament history
+            document.getElementById('tournamentHistory').innerHTML = `
+                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                    <strong>FIFA 14 Weekly Cup</strong>
+                    <div style="color: var(--text-light); font-size: 0.875rem;">Semi-finals • Ongoing</div>
+                </div>
+                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                    <strong>eFootball 2025 Pro League</strong>
+                    <div style="color: var(--text-light); font-size: 0.875rem;">Quarter-finals • Completed</div>
+                </div>
+                <div style="padding: 1rem;">
+                    <strong>FIFA 16 Legacy Tournament</strong>
+                    <div style="color: var(--text-light); font-size: 0.875rem;">Group stage • Completed</div>
+                </div>
+            `;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (Auth.checkAuth()) {
+                loadProfileData();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Management - Admin Panel</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">⚽ SoccerForum</a>
+                <div class="nav-links">
+                    <a href="/dashboard.html" class="nav-link">← Back to Dashboard</a>
+                    <div class="user-menu">
+                        <span class="user-info"></span>
+                        <button onclick="logout()" class="btn btn-outline">Logout</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main style="display: flex; min-height: calc(100vh - 80px);">
+        <aside class="admin-sidebar">
+            <h2 style="margin-bottom: 1.5rem;">Admin Panel</h2>
+            <ul class="admin-nav">
+                <li><a href="/admin/users.html">User Management</a></li>
+                <li><a href="/admin/forums.html">Forum Management</a></li>
+                <li><a href="/admin/tournaments.html" class="active">Tournament Management</a></li>
+                <li><a href="/admin/badges.html">Badge System</a></li>
+            </ul>
+        </aside>
+
+        <section style="flex: 1; padding: 2rem;">
+            <div class="container">
+                <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h1>Tournament Management</h1>
+                        <p style="color: var(--text-light);">Manage tournaments and participants</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-success" onclick="createTournament()">+ Create Tournament</button>
+                    </div>
+                </div>
+
+                <!-- Tournament Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card card">
+                        <span class="stat-number" id="totalTournaments">0</span>
+                        <span>Total Tournaments</span>
+                    </div>
+                    <div class="stat-card card">
+                        <span class="stat-number" id="activeTournaments">0</span>
+                        <span>Active Now</span>
+                    </div>
+                    <div class="stat-card card">
+                        <span class="stat-number" id="totalParticipants">0</span>
+                        <span>Total Participants</span>
+                    </div>
+                    <div class="stat-card card">
+                        <span class="stat-number" id="completionRate">0%</span>
+                        <span>Completion Rate</span>
+                    </div>
+                </div>
+
+                <!-- Tournaments List -->
+                <div class="card">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2>All Tournaments</h2>
+                        <div style="display: flex; gap: 1rem;">
+                            <select class="form-select" onchange="filterTournaments()" id="statusFilter">
+                                <option value="all">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="active">Active</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                            <input type="text" class="form-input" placeholder="Search tournaments..." style="width: 250px;" onkeyup="searchTournaments()">
+                        </div>
+                    </div>
+
+                    <div id="tournamentsContainer">
+                        <div class="alert">Loading tournaments...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        let allTournaments = [];
+
+        // Check admin access
+        if (!Auth.isAdmin()) {
+            window.location.href = '/dashboard.html';
+        }
+
+        async function loadTournaments() {
+            try {
+                // Simulate tournament data
+                allTournaments = [
+                    {
+                        id: 1,
+                        name: 'FIFA 14 Champions League',
+                        game_version: 'FIFA 14',
+                        status: 'active',
+                        max_teams: 16,
+                        current_teams: 12,
+                        creator: 'tournament_master',
+                        created_at: '2024-01-10',
+                        start_date: '2024-01-15',
+                        end_date: '2024-01-30'
+                    },
+                    {
+                        id: 2,
+                        name: 'eFootball 2025 Pro Cup',
+                        game_version: 'eFootball 2025',
+                        status: 'pending',
+                        max_teams: 32,
+                        current_teams: 8,
+                        creator: 'pro_gamer',
+                        created_at: '2024-01-12',
+                        start_date: '2024-01-20',
+                        end_date: null
+                    },
+                    {
+                        id: 3,
+                        name: 'FIFA 16 Legacy Tournament',
+                        game_version: 'FIFA 16',
+                        status: 'completed',
+                        max_teams: 8,
+                        current_teams: 8,
+                        creator: 'fifa_legend',
+                        created_at: '2024-01-05',
+                        start_date: '2024-01-08',
+                        end_date: '2024-01-12'
+                    },
+                    {
+                        id: 4,
+                        name: 'FIFA 15 Winter Cup',
+                        game_version: 'FIFA 15',
+                        status: 'cancelled',
+                        max_teams: 16,
+                        current_teams: 4,
+                        creator: 'winter_gamer',
+                        created_at: '2024-01-08',
+                        start_date: null,
+                        end_date: null
+                    }
+                ];
+
+                // Update stats
+                document.getElementById('totalTournaments').textContent = allTournaments.length;
+                document.getElementById('activeTournaments').textContent = allTournaments.filter(t => t.status === 'active').length;
+                document.getElementById('totalParticipants').textContent = allTournaments.reduce((sum, t) => sum + t.current_teams, 0);
+                document.getElementById('completionRate').textContent = 
+                    Math.round((allTournaments.filter(t => t.status === 'completed').length / allTournaments.length) * 100) + '%';
+
+                displayTournaments(allTournaments);
+
+            } catch (error) {
+                document.getElementById('tournamentsContainer').innerHTML = `
+                    <div class="alert alert-error">
+                        Error loading tournaments: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function displayTournaments(tournaments) {
+            const container = document.getElementById('tournamentsContainer');
+            
+            if (tournaments.length === 0) {
+                container.innerHTML = '<div class="alert">No tournaments found</div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border);">
+                                <th style="text-align: left; padding: 1rem;">Tournament</th>
+                                <th style="text-align: left; padding: 1rem;">Game</th>
+                                <th style="text-align: left; padding: 1rem;">Status</th>
+                                <th style="text-align: left; padding: 1rem;">Teams</th>
+                                <th style="text-align: left; padding: 1rem;">Dates</th>
+                                <th style="text-align: left; padding: 1rem;">Creator</th>
+                                <th style="text-align: left; padding: 1rem;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tournaments.map(tournament => `
+                                <tr style="border-bottom: 1px solid var(--border);">
+                                    <td style="padding: 1rem;">
+                                        <div style="font-weight: 500;">${tournament.name}</div>
+                                        <div style="color: var(--text-light); font-size: 0.875rem;">
+                                            Created: ${new Date(tournament.created_at).toLocaleDateString()}
+                                        </div>
+                                    </td>
+                                    <td style="padding: 1rem;">${tournament.game_version}</td>
+                                    <td style="padding: 1rem;">
+                                        <span class="tournament-status status-${tournament.status}">
+                                            ${tournament.status}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 1rem;">
+                                        ${tournament.current_teams}/${tournament.max_teams}
+                                    </td>
+                                    <td style="padding: 1rem;">
+                                        ${tournament.start_date ? new Date(tournament.start_date).toLocaleDateString() : 'TBD'} - 
+                                        ${tournament.end_date ? new Date(tournament.end_date).toLocaleDateString() : 'TBD'}
+                                    </td>
+                                    <td style="padding: 1rem;">${tournament.creator}</td>
+                                    <td style="padding: 1rem;">
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button onclick="viewTournament(${tournament.id})" class="btn btn-outline" style="padding: 0.5rem;">
+                                                View
+                                            </button>
+                                            <button onclick="manageTournament(${tournament.id})" class="btn btn-outline" style="padding: 0.5rem;">
+                                                Manage
+                                            </button>
+                                            ${tournament.status !== 'completed' && tournament.status !== 'cancelled' ? `
+                                                <button onclick="cancelTournament(${tournament.id})" class="btn btn-danger" style="padding: 0.5rem;">
+                                                    Cancel
+                                                </button>
+                                            ` : ''}
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function filterTournaments() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            let filtered = allTournaments;
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(t => t.status === statusFilter);
+            }
+            
+            displayTournaments(filtered);
+        }
+
+        function searchTournaments() {
+            const searchTerm = document.querySelector('input[type="text"]').value.toLowerCase();
+            const filtered = allTournaments.filter(t => 
+                t.name.toLowerCase().includes(searchTerm) ||
+                t.game_version.toLowerCase().includes(searchTerm) ||
+                t.creator.toLowerCase().includes(searchTerm)
+            );
+            displayTournaments(filtered);
+        }
+
+        function createTournament() {
+            window.location.href = '/tournaments/create.html';
+        }
+
+        function viewTournament(tournamentId) {
+            window.location.href = `/tournaments/fixtures.html?id=${tournamentId}`;
+        }
+
+        function manageTournament(tournamentId) {
+            alert(`Manage tournament with ID: ${tournamentId}`);
+        }
+
+        function cancelTournament(tournamentId) {
+            if (confirm('Are you sure you want to cancel this tournament? This action cannot be undone.')) {
+                alert(`Tournament ${tournamentId} would be cancelled (simulated)`);
+                loadTournaments(); // Reload the list
+            }
+        }
+
+        // Add tournament status styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .tournament-status {
+                padding: 0.25rem 0.75rem;
+                border-radius: 12px;
+                font-size: 0.75rem;
+                font-weight: 500;
+                text-transform: capitalize;
+            }
+            .status-pending { background: #fef3c7; color: #92400e; }
+            .status-active { background: #d1fae5; color: #065f46; }
+            .status-completed { background: #e0e7ff; color: #3730a3; }
+            .status-cancelled { background: #fecaca; color: #991b1b; }
+        `;
+        document.head.appendChild(style);
+
+        document.addEventListener('DOMContentLoaded', loadTournaments);
+    </script>
+</body>
+</html>

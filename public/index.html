@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soccer Forum - Connect with Football Fans</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">⚽ SoccerForum</a>
+                <div class="nav-links">
+                    <a href="/forums/fifa14.html" class="nav-link">FIFA 14</a>
+                    <a href="/forums/others.html" class="nav-link">Other FIFA</a>
+                    <a href="/tournaments/browse.html" class="nav-link">Tournaments</a>
+                    <div class="user-menu guest-only">
+                        <a href="/auth/login.html" class="btn btn-outline">Login</a>
+                        <a href="/auth/signup.html" class="btn btn-primary">Sign Up</a>
+                    </div>
+                    <div class="user-menu auth-only" style="display: none;">
+                        <a href="/dashboard.html" class="btn btn-outline">Dashboard</a>
+                        <button onclick="logout()" class="btn btn-outline">Logout</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section style="padding: 4rem 0; text-align: center; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white;">
+            <div class="container">
+                <h1 style="font-size: 3rem; margin-bottom: 1rem;">Welcome to SoccerForum</h1>
+                <p style="font-size: 1.25rem; margin-bottom: 2rem;">The ultimate platform for FIFA enthusiasts and soccer fans</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="/auth/signup.html" class="btn btn-success" style="font-size: 1.1rem; padding: 1rem 2rem;">Join Now</a>
+                    <a href="/forums/fifa14.html" class="btn btn-outline" style="font-size: 1.1rem; padding: 1rem 2rem; background: rgba(255,255,255,0.1); color: white; border-color: white;">Browse Forums</a>
+                </div>
+            </div>
+        </section>
+
+        <section style="padding: 4rem 0;">
+            <div class="container">
+                <div class="grid grid-3">
+                    <div class="card" style="text-align: center;">
+                        <h3>🎮 FIFA Discussions</h3>
+                        <p>Join discussions about FIFA 14, latest versions, strategies, and gameplay tips.</p>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <h3>🏆 Tournaments</h3>
+                        <p>Compete in online tournaments, win badges, and showcase your skills.</p>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <h3>👥 Community</h3>
+                        <p>Connect with fellow FIFA enthusiasts, share content, and build your network.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>

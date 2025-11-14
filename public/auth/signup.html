@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - SoccerForum</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">⚽ SoccerForum</a>
+                <a href="/auth/login.html" class="btn btn-outline">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <main style="padding: 4rem 0;">
+        <div class="container">
+            <div style="max-width: 400px; margin: 0 auto;">
+                <div class="card">
+                    <h1 style="text-align: center; margin-bottom: 2rem;">Create Your Account</h1>
+                    
+                    <form id="signupForm">
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-input" name="username" required minlength="3" maxlength="20">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-input" name="password" required minlength="6">
+                            <small style="color: var(--text-light);">Must be at least 6 characters long</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Confirm Password</label>
+                            <input type="password" class="form-input" name="confirmPassword" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success" style="width: 100%; margin-bottom: 1rem;">
+                            Create Account
+                        </button>
+                        
+                        <div style="text-align: center;">
+                            <a href="/auth/login.html">Already have an account? Login</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirmPassword');
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            const payload = {
+                username: formData.get('username'),
+                email: formData.get('email'),
+                password: password
+            };
+
+            try {
+                const data = await API.post('/auth/signup', payload);
+                
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    alert('Account created successfully! Welcome to SoccerForum!');
+                    window.location.href = '/dashboard.html';
+                }
+            } catch (error) {
+                alert(`Signup failed: ${error.message}`);
+            }
+        });
+
+        // Redirect if already logged in
+        if (Auth.isAuthenticated()) {
+            window.location.href = '/dashboard.html';
+        }
+    </script>
+</body>
+</html>

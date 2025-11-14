@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - SoccerForum</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">⚽ SoccerForum</a>
+                <div class="nav-links">
+                    <a href="/forums/fifa14.html" class="nav-link">FIFA 14</a>
+                    <a href="/forums/others.html" class="nav-link">Other FIFA</a>
+                    <a href="/tournaments/browse.html" class="nav-link">Tournaments</a>
+                    <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                    <div class="user-menu">
+                        <span class="user-info"></span>
+                        <a href="/profile/" class="btn btn-outline">Profile</a>
+                        <button onclick="logout()" class="btn btn-outline">Logout</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main style="padding: 2rem 0;">
+        <div class="container">
+            <div style="max-width: 800px; margin: 0 auto;">
+                <div style="margin-bottom: 1.5rem;">
+                    <a href="/profile/" class="btn btn-outline">← Back to Profile</a>
+                </div>
+
+                <div class="card">
+                    <h1 style="margin-bottom: 2rem;">Account Settings</h1>
+
+                    <!-- Settings Tabs -->
+                    <div style="display: flex; border-bottom: 1px solid var(--border); margin-bottom: 2rem;">
+                        <button class="tab-btn active" onclick="showTab('profile')">Profile</button>
+                        <button class="tab-btn" onclick="showTab('security')">Security</button>
+                        <button class="tab-btn" onclick="showTab('notifications')">Notifications</button>
+                        <button class="tab-btn" onclick="showTab('privacy')">Privacy</button>
+                    </div>
+
+                    <!-- Profile Tab -->
+                    <div id="profile-tab" class="tab-content">
+                        <form id="profileForm">
+                            <div class="form-group">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-input" id="username" value="${Auth.getUser() ? Auth.getUser().username : ''}" disabled>
+                                <small style="color: var(--text-light);">Username cannot be changed</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-input" id="email" value="${Auth.getUser() ? Auth.getUser().email : ''}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Bio</label>
+                                <textarea class="form-textarea" id="bio" placeholder="Tell us about yourself..." rows="4"></textarea>
+                                <small style="color: var(--text-light);">Max 500 characters</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Favorite FIFA Version</label>
+                                <select class="form-select" id="favoriteFifa">
+                                    <option value="">Select your favorite</option>
+                                    <option value="fifa14">FIFA 14</option>
+                                    <option value="fifa15">FIFA 15</option>
+                                    <option value="fifa16">FIFA 16</option>
+                                    <option value="fifa17">FIFA 17</option>
+                                    <option value="fifa18">FIFA 18</option>
+                                    <option value="fifa19">FIFA 19</option>
+                                    <option value="fifa20">FIFA 20</option>
+                                    <option value="fifa21">FIFA 21</option>
+                                    <option value="fifa22">FIFA 22</option>
+                                    <option value="fifa23">FIFA 23</option>
+                                    <option value="efootball">eFootball 2025</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-success">Update Profile</button>
+                        </form>
+                    </div>
+
+                    <!-- Security Tab -->
+                    <div id="security-tab" class="tab-content" style="display: none;">
+                        <form id="securityForm">
+                            <div class="form-group">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" class="form-input" id="currentPassword" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">New Password</label>
+                                <input type="password" class="form-input" id="newPassword" required minlength="6">
+                                <small style="color: var(--text-light);">Minimum 6 characters</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-input" id="confirmPassword" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-success">Change Password</button>
+                        </form>
+
+                        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+                            <h3>Login Sessions</h3>
+                            <div style="background: var(--background); padding: 1rem; border-radius: 6px; margin-top: 1rem;">
+                                <div style="display: flex; justify-content: between; align-items: center;">
+                                    <div>
+                                        <strong>Current Session</strong>
+                                        <div style="color: var(--text-light); font-size: 0.875rem;">
+                                            ${new Date().toLocaleString()} • ${navigator.userAgent.split(' ')[0]}
+                                        </div>
+                                    </div>
+                                    <span style="color: var(--success);">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications Tab -->
+                    <div id="notifications-tab" class="tab-content" style="display: none;">
+                        <form id="notificationsForm">
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="emailNotifications" checked>
+                                    Email notifications
+                                </label>
+                                <small style="color: var(--text-light); display: block;">Receive email updates about your threads and tournaments</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="threadReplies" checked>
+                                    Thread reply notifications
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="tournamentUpdates" checked>
+                                    Tournament updates
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="badgeAlerts" checked>
+                                    Badge and achievement alerts
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="newsletter">
+                                    Community newsletter
+                                </label>
+                                <small style="color: var(--text-light); display: block;">Weekly updates about new features and community events</small>
+                            </div>
+
+                            <button type="submit" class="btn btn-success">Save Preferences</button>
+                        </form>
+                    </div>
+
+                    <!-- Privacy Tab -->
+                    <div id="privacy-tab" class="tab-content" style="display: none;">
+                        <form id="privacyForm">
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="showOnlineStatus" checked>
+                                    Show online status
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="showActivity" checked>
+                                    Show recent activity
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="allowDirectMessages" checked>
+                                    Allow direct messages
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="showTournamentHistory">
+                                    Show tournament history
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="searchEngineIndex" checked>
+                                    Allow search engine indexing
+                                </label>
+                                <small style="color: var(--text-light); display: block;">Allow your profile to appear in search results</small>
+                            </div>
+
+                            <button type="submit" class="btn btn-success">Save Privacy Settings</button>
+                        </form>
+
+                        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+                            <h3 style="color: var(--danger);">Danger Zone</h3>
+                            <div style="background: #fef2f2; padding: 1.5rem; border-radius: 6px; margin-top: 1rem;">
+                                <p style="margin-bottom: 1rem;">Once you delete your account, there is no going back. Please be certain.</p>
+                                <button onclick="deleteAccount()" class="btn btn-danger">Delete My Account</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+        // Handle form submissions
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // Handle profile update
+            alert('Profile updated successfully!');
+        });
+
+        document.getElementById('securityForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            // Handle password change
+            alert('Password changed successfully!');
+        });
+
+        document.getElementById('notificationsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            alert('Notification preferences saved!');
+        });
+
+        document.getElementById('privacyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            alert('Privacy settings updated!');
+        });
+
+        function deleteAccount() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                alert('Account deletion requested. This feature would connect to the API in a real application.');
+            }
+        }
+
+        // Add tab styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .tab-btn {
+                padding: 1rem 1.5rem;
+                background: none;
+                border: none;
+                border-bottom: 2px solid transparent;
+                cursor: pointer;
+                font-weight: 500;
+            }
+            .tab-btn.active {
+                border-bottom-color: var(--primary);
+                color: var(--primary);
+            }
+            .tab-btn:hover {
+                background: var(--background);
+            }
+        `;
+        document.head.appendChild(style);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!Auth.checkAuth()) return;
+        });
+    </script>
+</body>
+</html>

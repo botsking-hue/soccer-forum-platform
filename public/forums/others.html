@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Other FIFA Versions - SoccerForum</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">⚽ SoccerForum</a>
+                <div class="nav-links">
+                    <a href="/forums/fifa14.html" class="nav-link">FIFA 14</a>
+                    <a href="/forums/others.html" class="nav-link active">Other FIFA</a>
+                    <a href="/tournaments/browse.html" class="nav-link">Tournaments</a>
+                    <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                    <div class="user-menu">
+                        <span class="user-info"></span>
+                        <a href="/forums/create-thread.html?forum=others" class="btn btn-success">Create Thread</a>
+                        <button onclick="logout()" class="btn btn-outline">Logout</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main style="padding: 2rem 0;">
+        <div class="container">
+            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 2rem;">
+                <div>
+                    <h1>Other FIFA Versions</h1>
+                    <p style="color: var(--text-light);">Discuss FIFA 15, 16, 17 and newer versions</p>
+                </div>
+                <div class="auth-only" style="display: none;">
+                    <a href="/forums/create-thread.html?forum=others" class="btn btn-success">+ New Thread</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="margin-bottom: 1.5rem;">
+                    <h3>Forum Categories</h3>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                        <div class="card" style="flex: 1; min-width: 200px; text-align: center;">
+                            <h4>FIFA 15-17</h4>
+                            <p>PS3/Xbox 360 era discussions</p>
+                        </div>
+                        <div class="card" style="flex: 1; min-width: 200px; text-align: center;">
+                            <h4>FIFA 18-22</h4>
+                            <p>Frostbite engine versions</p>
+                        </div>
+                        <div class="card" style="flex: 1; min-width: 200px; text-align: center;">
+                            <h4>FIFA 23+</h4>
+                            <p>EA Sports FC era</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="threadsContainer" class="thread-list">
+                    <div class="alert">Loading threads...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        async function loadThreads() {
+            try {
+                const data = await API.get('/forum/others/threads');
+                const container = document.getElementById('threadsContainer');
+                
+                if (data.threads && data.threads.length > 0) {
+                    container.innerHTML = data.threads.map(thread => `
+                        <div class="thread-item">
+                            <a href="/forums/thread.html?id=${thread.id}" class="thread-title">
+                                ${thread.title}
+                            </a>
+                            <p class="thread-preview">${thread.content.substring(0, 150)}...</p>
+                            <div class="thread-meta">
+                                By ${thread.creator_username} • 
+                                ${new Date(thread.created_at).toLocaleDateString()} •
+                                ${thread.tags ? thread.tags.map(tag => `<span style="background: var(--secondary); color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.75rem;">${tag}</span>`).join(' ') : ''}
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="alert" style="text-align: center;">
+                            <h3>No threads yet</h3>
+                            <p>Start a discussion about other FIFA versions!</p>
+                            <a href="/forums/create-thread.html?forum=others" class="btn btn-success">Create First Thread</a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('threadsContainer').innerHTML = `
+                    <div class="alert alert-error">
+                        Error loading threads: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (Auth.checkAuth()) {
+                loadThreads();
+            }
+        });
+    </script>
+</body>
+</html>

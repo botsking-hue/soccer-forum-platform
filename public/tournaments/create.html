@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Tournament - SoccerForum</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">⚽ SoccerForum</a>
+                <div class="nav-links">
+                    <a href="/forums/fifa14.html" class="nav-link">FIFA 14</a>
+                    <a href="/forums/others.html" class="nav-link">Other FIFA</a>
+                    <a href="/tournaments/browse.html" class="nav-link">Tournaments</a>
+                    <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                    <div class="user-menu">
+                        <span class="user-info"></span>
+                        <button onclick="logout()" class="btn btn-outline">Logout</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main style="padding: 2rem 0;">
+        <div class="container">
+            <div style="max-width: 600px; margin: 0 auto;">
+                <div style="margin-bottom: 1.5rem;">
+                    <a href="/tournaments/browse.html" class="btn btn-outline">← Back to Tournaments</a>
+                </div>
+
+                <div class="card">
+                    <h1 style="margin-bottom: 0.5rem;">Create New Tournament</h1>
+                    <p style="color: var(--text-light); margin-bottom: 2rem;">Organize a tournament for the community</p>
+
+                    <form id="createTournamentForm">
+                        <div class="form-group">
+                            <label class="form-label">Tournament Name</label>
+                            <input type="text" class="form-input" name="name" placeholder="e.g., FIFA 14 Champions League" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Game Version</label>
+                            <select class="form-select" name="game_version" required>
+                                <option value="">Select Game Version</option>
+                                <option value="FIFA 14">FIFA 14</option>
+                                <option value="FIFA 15">FIFA 15</option>
+                                <option value="FIFA 16">FIFA 16</option>
+                                <option value="FIFA 17">FIFA 17</option>
+                                <option value="FIFA 18">FIFA 18</option>
+                                <option value="FIFA 19">FIFA 19</option>
+                                <option value="FIFA 20">FIFA 20</option>
+                                <option value="FIFA 21">FIFA 21</option>
+                                <option value="FIFA 22">FIFA 22</option>
+                                <option value="FIFA 23">FIFA 23</option>
+                                <option value="eFootball 2025">eFootball 2025</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Maximum Teams</label>
+                            <select class="form-select" name="max_teams" required>
+                                <option value="">Select Team Limit</option>
+                                <option value="8">8 Teams</option>
+                                <option value="16">16 Teams</option>
+                                <option value="32">32 Teams</option>
+                                <option value="64">64 Teams</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Tournament Description</label>
+                            <textarea class="form-textarea" name="description" placeholder="Describe your tournament rules, prizes, schedule..." rows="4"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Rules (Optional)</label>
+                            <textarea class="form-textarea" name="rules" placeholder="Add specific rules for the tournament..." rows="3"></textarea>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                            <button type="submit" class="btn btn-success">Create Tournament</button>
+                            <a href="/tournaments/browse.html" class="btn btn-outline">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card" style="margin-top: 2rem;">
+                    <h3>🏆 Tournament Creation Tips</h3>
+                    <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                        <li>Choose a clear and exciting tournament name</li>
+                        <li>Set realistic team limits based on expected participation</li>
+                        <li>Clearly describe rules and expectations</li>
+                        <li>Consider time zones when planning schedules</li>
+                        <li>Be available to manage the tournament throughout</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        document.getElementById('createTournamentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const tournamentData = {
+                name: formData.get('name'),
+                game_version: formData.get('game_version'),
+                max_teams: parseInt(formData.get('max_teams')),
+                description: formData.get('description') || '',
+                rules: formData.get('rules') || ''
+            };
+
+            try {
+                const tournament = await TournamentManager.createTournament(tournamentData);
+                if (tournament) {
+                    alert('Tournament created successfully!');
+                    window.location.href = `/tournaments/fixtures.html?id=${tournament.id}`;
+                }
+            } catch (error) {
+                alert(`Error creating tournament: ${error.message}`);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!Auth.checkAuth()) return;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+{
+  "name": "soccer-forum-platform",
+  "version": "1.0.0",
+  "description": "A soccer forum and tournament platform with Netlify deployment",
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 8000 -d public",
+    "build": "echo 'No build process needed for static site'",
+    "start": "python3 -m http.server 8000 -d public",
+    "netlify-dev": "netlify dev",
+    "setup-functions": "npm run copy-shared-libs && npm run copy-functions",
+    "copy-shared-libs": "mkdir -p netlify/functions/shared && cp -r shared/* netlify/functions/shared/",
+    "copy-functions": "mkdir -p netlify/functions && cp -r functions/* netlify/functions/ 2>/dev/null || echo 'No functions directory found'",
+    "install-deps": "cd netlify/functions && npm install",
+    "clean": "rm -rf netlify/functions",
+    "deploy": "npm run setup-functions && netlify deploy --prod",
+    "deploy-functions": "npm run setup-functions && netlify deploy --prod --functions",
+    "lint": "echo 'No linting configured'",
+    "test": "echo 'No tests configured'"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^2.4.0",
+    "netlify-cli": "^17.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "forum",
+    "soccer",
+    "fifa",
+    "tournament",
+    "gaming",
+    "netlify",
+    "serverless"
+  ],
+  "author": "SoccerForum Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/botsking-hue/soccer-forum-platform"
+  },
+  "bugs": {
+    "url": "https://github.com/botsking-hue/soccer-forum-platform/issues"
+  },
+  "homepage": "https://ahagaming.netlify.app"
+}

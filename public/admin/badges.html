@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Badge System - Admin Panel</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">⚽ SoccerForum</a>
+                <div class="nav-links">
+                    <a href="/dashboard.html" class="nav-link">← Back to Dashboard</a>
+                    <div class="user-menu">
+                        <span class="user-info"></span>
+                        <button onclick="logout()" class="btn btn-outline">Logout</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main style="display: flex; min-height: calc(100vh - 80px);">
+        <aside class="admin-sidebar">
+            <h2 style="margin-bottom: 1.5rem;">Admin Panel</h2>
+            <ul class="admin-nav">
+                <li><a href="/admin/users.html">User Management</a></li>
+                <li><a href="/admin/forums.html">Forum Management</a></li>
+                <li><a href="/admin/tournaments.html">Tournament Management</a></li>
+                <li><a href="/admin/badges.html" class="active">Badge System</a></li>
+            </ul>
+        </aside>
+
+        <section style="flex: 1; padding: 2rem;">
+            <div class="container">
+                <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h1>Badge System</h1>
+                        <p style="color: var(--text-light);">Manage user badges and achievements</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-success" onclick="showAwardBadgeModal()">+ Award Badge</button>
+                    </div>
+                </div>
+
+                <!-- Badge Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card card">
+                        <span class="stat-number" id="totalBadges">0</span>
+                        <span>Total Badges</span>
+                    </div>
+                    <div class="stat-card card">
+                        <span class="stat-number" id="awardedBadges">0</span>
+                        <span>Awarded</span>
+                    </div>
+                    <div class="stat-card card">
+                        <span class="stat-number" id="uniqueUsers">0</span>
+                        <span>Unique Users</span>
+                    </div>
+                    <div class="stat-card card">
+                        <span class="stat-number" id="popularBadge">-</span>
+                        <span>Most Popular</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-2" style="gap: 2rem; margin-top: 2rem;">
+                    <!-- Available Badges -->
+                    <div class="card">
+                        <h2 style="margin-bottom: 1.5rem;">Available Badges</h2>
+                        <div id="badgesList">
+                            <div class="alert">Loading badges...</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Awards -->
+                    <div class="card">
+                        <h2 style="margin-bottom: 1.5rem;">Recent Badge Awards</h2>
+                        <div id="recentAwards">
+                            <div class="alert">Loading recent awards...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Badge Management -->
+                <div class="card" style="margin-top: 2rem;">
+                    <h2 style="margin-bottom: 1.5rem;">Badge Management</h2>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-outline" onclick="createBadgeType()">Create New Badge Type</button>
+                        <button class="btn btn-outline" onclick="manageBadgeCategories()">Manage Categories</button>
+                        <button class="btn btn-outline" onclick="exportBadgeData()">Export Data</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Award Badge Modal -->
+    <div id="awardBadgeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="card" style="width: 500px; max-width: 90vw;">
+            <h2 style="margin-bottom: 1.5rem;">Award Badge to User</h2>
+            
+            <form id="awardBadgeForm">
+                <div class="form-group">
+                    <label class="form-label">User</label>
+                    <select class="form-select" name="user_id" required>
+                        <option value="">Select User</option>
+                        <option value="1">player1</option>
+                        <option value="2">fifa_pro</option>
+                        <option value="3">tournament_master</option>
+                        <option value="4">soccer_fan</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Badge Type</label>
+                    <select class="form-select" name="badge_name" required>
+                        <option value="">Select Badge</option>
+                        <option value="Tournament Champion">Tournament Champion</option>
+                        <option value="Active Member">Active Member</option>
+                        <option value="Forum Expert">Forum Expert</option>
+                        <option value="Community Helper">Community Helper</option>
+                        <option value="Content Creator">Content Creator</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Tournament (Optional)</label>
+                    <select class="form-select" name="tournament_id">
+                        <option value="">No specific tournament</option>
+                        <option value="1">FIFA 14 Champions League</option>
+                        <option value="2">eFootball 2025 Pro Cup</option>
+                        <option value="3">FIFA 16 Legacy Tournament</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Reason (Optional)</label>
+                    <textarea class="form-textarea" name="reason" placeholder="Why is this badge being awarded?" rows="3"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-success">Award Badge</button>
+                    <button type="button" class="btn btn-outline" onclick="hideAwardBadgeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script>
+        // Check admin access
+        if (!Auth.isAdmin()) {
+            window.location.href = '/dashboard.html';
+        }
+
+        async function loadBadges() {
+            try {
+                // Simulate badge data
+                const badges = [
+                    { name: 'Tournament Champion', description: 'Win a tournament', color: 'gold', awarded: 15 },
+                    { name: 'Active Member', description: 'Post 50+ replies', color: 'silver', awarded: 42 },
+                    { name: 'Forum Expert', description: 'Create 10+ popular threads', color: 'bronze', awarded: 8 },
+                    { name: 'Community Helper', description: 'Help other members', color: 'blue', awarded: 23 },
+                    { name: 'Content Creator', description: 'Create valuable content', color: 'purple', awarded: 12 }
+                ];
+
+                const recentAwards = [
+                    { user: 'player1', badge: 'Tournament Champion', date: '2024-01-15', tournament: 'FIFA 14 Champions League' },
+                    { user: 'fifa_pro', badge: 'Active Member', date: '2024-01-14', tournament: null },
+                    { user: 'soccer_fan', badge: 'Community Helper', date: '2024-01-13', tournament: null },
+                    { user: 'tournament_master', badge: 'Content Creator', date: '2024-01-12', tournament: null }
+                ];
+
+                // Update stats
+                document.getElementById('totalBadges').textContent = badges.length;
+                document.getElementById('awardedBadges').textContent = badges.reduce((sum, b) => sum + b.awarded, 0);
+                document.getElementById('uniqueUsers').textContent = '35'; // Simulated
+                document.getElementById('popularBadge').textContent = badges.reduce((max, b) => b.awarded > max.awarded ? b : max, badges[0]).name;
+
+                // Display badges
+                const badgesContainer = document.getElementById('badgesList');
+                badgesContainer.innerHTML = badges.map(badge => `
+                    <div style="padding: 1.5rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 50px; height: 50px; background: ${badge.color}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                                🏆
+                            </div>
+                            <div style="flex: 1;">
+                                <h3 style="margin: 0 0 0.25rem 0;">${badge.name}</h3>
+                                <p style="color: var(--text-light); margin: 0 0 0.5rem 0;">${badge.description}</p>
+                                <div style="color: var(--text-light); font-size: 0.875rem;">
+                                    Awarded ${badge.awarded} times
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-outline" onclick="editBadge('${badge.name}')">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Display recent awards
+                const awardsContainer = document.getElementById('recentAwards');
+                awardsContainer.innerHTML = recentAwards.map(award => `
+                    <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                        <div style="display: flex; justify-content: between; align-items: start;">
+                            <div>
+                                <strong>${award.user}</strong>
+                                <div style="color: var(--text-light); font-size: 0.875rem;">
+                                    Received <strong>${award.badge}</strong>
+                                    ${award.tournament ? ` in ${award.tournament}` : ''}
+                                </div>
+                            </div>
+                            <div style="color: var(--text-light); font-size: 0.875rem;">
+                                ${new Date(award.date).toLocaleDateString()}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                document.getElementById('badgesList').innerHTML = `
+                    <div class="alert alert-error">
+                        Error loading badges: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function showAwardBadgeModal() {
+            document.getElementById('awardBadgeModal').style.display = 'flex';
+        }
+
+        function hideAwardBadgeModal() {
+            document.getElementById('awardBadgeModal').style.display = 'none';
+        }
+
+        document.getElementById('awardBadgeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            const badgeData = {
+                user_id: formData.get('user_id'),
+                badge_name: formData.get('badge_name'),
+                tournament_id: formData.get('tournament_id') || null,
+                reason: formData.get('reason') || ''
+            };
+
+            try {
+                await AdminManager.awardBadge(
+                    badgeData.user_id, 
+                    badgeData.tournament_id, 
+                    badgeData.badge_name
+                );
+                
+                alert('Badge awarded successfully!');
+                hideAwardBadgeModal();
+                loadBadges(); // Reload to show updated stats
+
+            } catch (error) {
+                alert(`Error awarding badge: ${error.message}`);
+            }
+        });
+
+        function editBadge(badgeName) {
+            alert(`Edit badge: ${badgeName}`);
+        }
+
+        function createBadgeType() {
+            alert('Create new badge type functionality would open a form');
+        }
+
+        function manageBadgeCategories() {
+            alert('Manage badge categories functionality');
+        }
+
+        function exportBadgeData() {
+            alert('Exporting badge data...');
+            // This would generate and download a CSV file in a real app
+        }
+
+        document.addEventListener('DOMContentLoaded', loadBadges);
+    </script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Tournament - SoccerForum</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">⚽ SoccerForum</a>
+                <div class="nav-links">
+                    <a href="/forums/fifa14.html" class="nav-link">FIFA 14</a>
+                    <a href="/forums/others.html" class="nav-link">Other FIFA</a>
+                    <a href="/tournaments/browse.html" class="nav-link">Tournaments</a>
+                    <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                    <div class="user-menu">
+                        <span class="user-info"></span>
+                        <button onclick="logout()" class="btn btn-outline">Logout</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main style="padding: 2rem 0;">
+        <div class="container">
+            <div style="max-width: 600px; margin: 0 auto;">
+                <div style="margin-bottom: 1.5rem;">
+                    <a href="/tournaments/browse.html" class="btn btn-outline">← Back to Tournaments</a>
+                </div>
+
+                <div id="tournamentInfo">
+                    <div class="card">
+                        <div class="alert">Loading tournament information...</div>
+                    </div>
+                </div>
+
+                <div class="card" id="joinForm" style="display: none;">
+                    <h2>Join Tournament</h2>
+                    <p style="color: var(--text-light); margin-bottom: 1.5rem;">Enter your team details to participate</p>
+
+                    <form id="joinTournamentForm">
+                        <div class="form-group">
+                            <label class="form-label">Team Name</label>
+                            <input type="text" class="form-input" name="team_name" placeholder="Enter your team name" required>
+                            <small style="color: var(--text-light);">This will be displayed to other participants</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" name="agree_rules" required>
+                                I agree to follow the tournament rules and code of conduct
+                            </label>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                            <button type="submit" class="btn btn-success">Join Tournament</button>
+                            <a href="/tournaments/browse.html" class="btn btn-outline">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card" id="alreadyJoined" style="display: none;">
+                    <div style="text-align: center; padding: 2rem;">
+                        <h3>✅ Already Joined</h3>
+                        <p style="color: var(--text-light); margin-bottom: 2rem;">You are already participating in this tournament</p>
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <a href="/tournaments/fixtures.html" class="btn btn-primary">View Fixtures</a>
+                            <a href="/tournaments/browse.html" class="btn btn-outline">Browse More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const tournamentId = urlParams.get('id');
+
+        async function loadTournamentInfo() {
+            if (!tournamentId) {
+                document.getElementById('tournamentInfo').innerHTML = `
+                    <div class="alert alert-error">Tournament ID is missing</div>
+                `;
+                return;
+            }
+
+            try {
+                // Simulate loading tournament data
+                const tournament = {
+                    id: tournamentId,
+                    name: 'FIFA 14 Champions League',
+                    game_version: 'FIFA 14',
+                    status: 'pending',
+                    max_teams: 16,
+                    current_teams: 12,
+                    creator: 'tournament_master',
+                    description: 'Compete in this exciting FIFA 14 tournament with knockout stages',
+                    rules: '• Fair play required\n• No cheating\n• Matches must be completed within schedule'
+                };
+
+                document.getElementById('tournamentInfo').innerHTML = `
+                    <div class="card">
+                        <h1 style="margin-bottom: 0.5rem;">${tournament.name}</h1>
+                        <div style="color: var(--text-light); margin-bottom: 1rem;">
+                            <strong>Game:</strong> ${tournament.game_version} • 
+                            <strong>Status:</strong> <span class="tournament-status status-${tournament.status}">${tournament.status}</span> • 
+                            <strong>Teams:</strong> ${tournament.current_teams}/${tournament.max_teams}
+                        </div>
+                        <p style="margin-bottom: 1rem;">${tournament.description}</p>
+                        ${tournament.rules ? `
+                            <div style="background: var(--background); padding: 1rem; border-radius: 6px; margin-top: 1rem;">
+                                <strong>Tournament Rules:</strong>
+                                <pre style="margin-top: 0.5rem; white-space: pre-wrap;">${tournament.rules}</pre>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                // Check if user already joined (simulate)
+                const hasJoined = false; // Replace with actual API check
+                
+                if (hasJoined) {
+                    document.getElementById('alreadyJoined').style.display = 'block';
+                } else {
+                    document.getElementById('joinForm').style.display = 'block';
+                }
+
+            } catch (error) {
+                document.getElementById('tournamentInfo').innerHTML = `
+                    <div class="alert alert-error">
+                        Error loading tournament: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        document.getElementById('joinTournamentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const teamName = formData.get('team_name');
+
+            try {
+                await TournamentManager.joinTournament(tournamentId);
+                // If successful, show success message
+                document.getElementById('joinForm').style.display = 'none';
+                document.getElementById('alreadyJoined').style.display = 'block';
+                document.getElementById('alreadyJoined').innerHTML = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <h3>✅ Successfully Joined!</h3>
+                        <p style="color: var(--text-light); margin-bottom: 1rem;">Your team "<strong>${teamName}</strong>" has been registered</p>
+                        <p style="margin-bottom: 2rem;">Tournament organizer will contact you with further details.</p>
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <a href="/tournaments/fixtures.html?id=${tournamentId}" class="btn btn-primary">View Fixtures</a>
+                            <a href="/dashboard.html" class="btn btn-outline">Go to Dashboard</a>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                alert(`Error joining tournament: ${error.message}`);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (Auth.checkAuth()) {
+                loadTournamentInfo();
+            }
+        });
+    </script>
+</body>
+</html>

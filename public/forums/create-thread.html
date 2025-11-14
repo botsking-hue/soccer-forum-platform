@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Thread - SoccerForum</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">⚽ SoccerForum</a>
+                <div class="nav-links">
+                    <a href="/forums/fifa14.html" class="nav-link">FIFA 14</a>
+                    <a href="/forums/others.html" class="nav-link">Other FIFA</a>
+                    <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                    <div class="user-menu">
+                        <span class="user-info"></span>
+                        <button onclick="logout()" class="btn btn-outline">Logout</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main style="padding: 2rem 0;">
+        <div class="container">
+            <div style="max-width: 800px; margin: 0 auto;">
+                <div style="margin-bottom: 1.5rem;">
+                    <a href="javascript:history.back()" class="btn btn-outline">← Back</a>
+                </div>
+
+                <div class="card">
+                    <h1 style="margin-bottom: 0.5rem;">Create New Thread</h1>
+                    <p style="color: var(--text-light); margin-bottom: 2rem;" id="forumInfo">
+                        Creating thread in <span id="forumName">Forum</span>
+                    </p>
+
+                    <form id="createThreadForm">
+                        <div class="form-group">
+                            <label class="form-label">Thread Title</label>
+                            <input type="text" class="form-input" name="title" placeholder="Enter a descriptive title..." required maxlength="200">
+                            <small style="color: var(--text-light);">Be specific about what you want to discuss</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Content</label>
+                            <textarea class="form-textarea" name="content" placeholder="Write your thread content here..." required minlength="10"></textarea>
+                            <small style="color: var(--text-light);">Minimum 10 characters. You can use basic formatting.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Tags (Optional)</label>
+                            <input type="text" class="form-input" name="tags" placeholder="fifa14, gameplay, tips (comma separated)">
+                            <small style="color: var(--text-light);">Add up to 5 tags to help others find your thread</small>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                            <button type="submit" class="btn btn-success">Create Thread</button>
+                            <a href="javascript:history.back()" class="btn btn-outline">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card" style="margin-top: 2rem;">
+                    <h3>📝 Thread Creation Tips</h3>
+                    <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                        <li>Use a clear and descriptive title</li>
+                        <li>Provide enough context in your content</li>
+                        <li>Use tags to categorize your thread</li>
+                        <li>Be respectful and follow community guidelines</li>
+                        <li>Check if a similar thread already exists</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        // Get forum from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const forumSlug = urlParams.get('forum') || 'fifa14';
+        
+        // Map forum slugs to display names
+        const forumNames = {
+            'fifa14': 'FIFA 14 Forum',
+            'others': 'Other FIFA Versions Forum'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!Auth.checkAuth()) return;
+
+            // Set forum info
+            document.getElementById('forumName').textContent = forumNames[forumSlug] || 'Forum';
+            
+            // Handle form submission
+            document.getElementById('createThreadForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = new FormData(e.target);
+                const tags = formData.get('tags') 
+                    ? formData.get('tags').split(',').map(tag => tag.trim()).filter(tag => tag)
+                    : [];
+
+                const threadData = {
+                    title: formData.get('title'),
+                    content: formData.get('content'),
+                    tags: tags
+                };
+
+                try {
+                    await ForumManager.createThread(forumSlug, threadData);
+                } catch (error) {
+                    alert(`Error: ${error.message}`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SoccerForum</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">⚽ SoccerForum</a>
+                <div class="nav-links">
+                    <a href="/forums/fifa14.html" class="nav-link">FIFA 14</a>
+                    <a href="/forums/others.html" class="nav-link">Other FIFA</a>
+                    <a href="/tournaments/browse.html" class="nav-link">Tournaments</a>
+                    <a href="/dashboard.html" class="nav-link active">Dashboard</a>
+                    <div class="user-menu">
+                        <span class="user-info"></span>
+                        <a href="/profile/" class="btn btn-outline">Profile</a>
+                        <button onclick="logout()" class="btn btn-outline">Logout</button>
+                        <div class="admin-only" style="display: none;">
+                            <a href="/admin.html" class="btn btn-primary">Admin Panel</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main style="padding: 2rem 0;">
+        <div class="container">
+            <h1 style="margin-bottom: 2rem;">Your Dashboard</h1>
+            
+            <div class="stats-grid">
+                <div class="stat-card card">
+                    <span class="stat-number" id="threadCount">0</span>
+                    <span>Your Threads</span>
+                </div>
+                <div class="stat-card card">
+                    <span class="stat-number" id="replyCount">0</span>
+                    <span>Your Replies</span>
+                </div>
+                <div class="stat-card card">
+                    <span class="stat-number" id="tournamentCount">0</span>
+                    <span>Tournaments</span>
+                </div>
+                <div class="stat-card card">
+                    <span class="stat-number" id="badgeCount">0</span>
+                    <span>Badges</span>
+                </div>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <h2>Recent Activity</h2>
+                    <div id="recentActivity" class="thread-list">
+                        <div class="alert">Loading your activity...</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Quick Actions</h2>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <a href="/forums/create-thread.html" class="btn btn-primary">Create Thread</a>
+                        <a href="/tournaments/browse.html" class="btn btn-success">Join Tournament</a>
+                        <a href="/tournaments/create.html" class="btn btn-outline">Create Tournament</a>
+                        <a href="/profile/" class="btn btn-outline">View Profile</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                // Simulate loading user stats (replace with actual API calls)
+                document.getElementById('threadCount').textContent = '5';
+                document.getElementById('replyCount').textContent = '23';
+                document.getElementById('tournamentCount').textContent = '3';
+                document.getElementById('badgeCount').textContent = '2';
+
+                // Load recent activity
+                const activityContainer = document.getElementById('recentActivity');
+                activityContainer.innerHTML = `
+                    <div class="thread-item">
+                        <a href="/forums/thread.html?id=1" class="thread-title">Best formations for FIFA 14</a>
+                        <div class="thread-meta">Posted 2 hours ago</div>
+                    </div>
+                    <div class="thread-item">
+                        <a href="/forums/thread.html?id=2" class="thread-title">Tournament starting soon!</a>
+                        <div class="thread-meta">Replied 1 day ago</div>
+                    </div>
+                    <div class="thread-item">
+                        <a href="/forums/thread.html?id=3" class="thread-title">New badge unlocked: Tournament Champion</a>
+                        <div class="thread-meta">Achieved 3 days ago</div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+</html>

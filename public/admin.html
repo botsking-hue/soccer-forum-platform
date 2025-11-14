@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - SoccerForum</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">⚽ SoccerForum</a>
+                <div class="nav-links">
+                    <a href="/dashboard.html" class="nav-link">← Back to Dashboard</a>
+                    <div class="user-menu">
+                        <span class="user-info"></span>
+                        <button onclick="logout()" class="btn btn-outline">Logout</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main style="display: flex; min-height: calc(100vh - 80px);">
+        <aside class="admin-sidebar">
+            <h2 style="margin-bottom: 1.5rem;">Admin Panel</h2>
+            <ul class="admin-nav">
+                <li><a href="/admin/users.html" class="active">User Management</a></li>
+                <li><a href="/admin/forums.html">Forum Management</a></li>
+                <li><a href="/admin/tournaments.html">Tournament Management</a></li>
+                <li><a href="/admin/badges.html">Badge System</a></li>
+            </ul>
+        </aside>
+
+        <section style="flex: 1; padding: 2rem;">
+            <div class="container">
+                <h1 style="margin-bottom: 2rem;">Admin Dashboard</h1>
+                
+                <div class="stats-grid">
+                    <div class="stat-card card">
+                        <span class="stat-number" id="totalUsers">0</span>
+                        <span>Total Users</span>
+                    </div>
+                    <div class="stat-card card">
+                        <span class="stat-number" id="totalThreads">0</span>
+                        <span>Total Threads</span>
+                    </div>
+                    <div class="stat-card card">
+                        <span class="stat-number" id="activeTournaments">0</span>
+                        <span>Active Tournaments</span>
+                    </div>
+                    <div class="stat-card card">
+                        <span class="stat-number" id="moderators">0</span>
+                        <span>Moderators</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <h2>Recent Signups</h2>
+                        <div id="recentUsers">
+                            <div class="alert">Loading recent users...</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2>System Status</h2>
+                        <div id="systemStatus">
+                            <div style="margin-bottom: 1rem;">
+                                <strong>Database:</strong> <span style="color: var(--success);">✅ Connected</span>
+                            </div>
+                            <div style="margin-bottom: 1rem;">
+                                <strong>API:</strong> <span style="color: var(--success);">✅ Operational</span>
+                            </div>
+                            <div style="margin-bottom: 1rem;">
+                                <strong>Storage:</strong> <span style="color: var(--success);">✅ Healthy</span>
+                            </div>
+                            <div>
+                                <strong>Last Backup:</strong> <span>Today, 02:00 AM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        // Check admin access
+        if (!Auth.isAdmin()) {
+            window.location.href = '/dashboard.html';
+        }
+
+        // Load admin dashboard data
+        async function loadAdminDashboard() {
+            try {
+                // Simulate loading admin stats
+                document.getElementById('totalUsers').textContent = '1,234';
+                document.getElementById('totalThreads').textContent = '5,678';
+                document.getElementById('activeTournaments').textContent = '12';
+                document.getElementById('moderators').textContent = '8';
+
+                // Load recent users
+                const usersContainer = document.getElementById('recentUsers');
+                usersContainer.innerHTML = `
+                    <div style="padding: 0.75rem; border-bottom: 1px solid var(--border);">
+                        <strong>john_doe</strong> - Joined 2 hours ago
+                    </div>
+                    <div style="padding: 0.75rem; border-bottom: 1px solid var(--border);">
+                        <strong>fifa_pro</strong> - Joined 5 hours ago
+                    </div>
+                    <div style="padding: 0.75rem; border-bottom: 1px solid var(--border);">
+                        <strong>soccer_fan</strong> - Joined 1 day ago
+                    </div>
+                    <div style="padding: 0.75rem;">
+                        <strong>game_changer</strong> - Joined 1 day ago
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading admin dashboard:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAdminDashboard);
+    </script>
+</body>
+</html>
