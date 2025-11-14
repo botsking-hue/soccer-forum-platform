@@ -1,5 +1,5 @@
 [build]
-  command = "npm run setup-functions"
+  command = "rm -rf netlify && mkdir -p netlify/functions && cp -r functions/* netlify/functions/ 2>/dev/null || (echo 'No functions to copy' && mkdir -p netlify/functions) && cp -r shared netlify/functions/ 2>/dev/null || echo 'No shared libs to copy'"
   publish = "public"
   functions = "netlify/functions"
 
@@ -7,54 +7,39 @@
   NODE_VERSION = "18"
 
 [dev]
-  command = "npm run netlify-dev"
+  command = "netlify dev"
   port = 8888
   publish = "public"
 
-# Redirect all API routes to serverless functions
+# API redirects - MUST come before the SPA fallback
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
 
-# Specific API route redirects for better organization
+# Specific API endpoints for better organization
 [[redirects]]
-  from = "/api/admin/*"
-  to = "/.netlify/functions/admin/:splat"
+  from = "/api/auth/login"
+  to = "/.netlify/functions/auth/login"
   status = 200
 
 [[redirects]]
-  from = "/api/auth/*"
-  to = "/.netlify/functions/auth/:splat"
+  from = "/api/auth/signup"
+  to = "/.netlify/functions/auth/signup"
   status = 200
 
 [[redirects]]
-  from = "/api/tournament/*"
-  to = "/.netlify/functions/tournament/:splat"
+  from = "/api/test"
+  to = "/.netlify/functions/test"
   status = 200
 
-[[redirects]]
-  from = "/api/threads/*"
-  to = "/.netlify/functions/threads/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/api/forum/*"
-  to = "/.netlify/functions/forum/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/api/follow/*"
-  to = "/.netlify/functions/follow/:splat"
-  status = 200
-
-# SPA fallback for client-side routing
+# SPA fallback for client-side routing - MUST be last
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-# Security headers for all pages
+# Security headers
 [[headers]]
   for = "/*"
   [headers.values]
@@ -62,18 +47,17 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
 
 # CORS headers for API functions
 [[headers]]
   for = "/.netlify/functions/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type, Authorization, X-Requested-With"
-    Access-Control-Allow-Credentials = "true"
+    Access-Control-Max-Age = "86400"
 
-# Cache optimization for static assets
+# Cache optimization
 [[headers]]
   for = "/css/*"
   [headers.values]
@@ -89,29 +73,25 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# HTML files - no cache for development
 [[headers]]
   for = "/*.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 
-# Environment-specific configurations
+# Environment configurations
 [context.production.environment]
   NODE_ENV = "production"
-  SITE_URL = "https://your-site.netlify.app"
+  SITE_URL = "https://ahagaming.netlify.app"
 
 [context.deploy-preview.environment]
-  NODE_ENV = "preview"
+  NODE_ENV = "preview" 
   SITE_URL = "https://deploy-preview-*.netlify.app"
 
 [context.branch-deploy.environment]
   NODE_ENV = "development"
   SITE_URL = "https://*-*.netlify.app"
 
+# Development context
 [context.dev.environment]
   NODE_ENV = "development"
   SITE_URL = "http://localhost:8888"
-
-# Build plugins (optional - for advanced features)
-# [[plugins]]
-#   package = "@netlify/plugin-sitemap"
